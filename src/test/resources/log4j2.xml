@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" monitorInterval="30"
+	verbose="false">
+
+	<Appenders>
+		<Console name="CONSOLE" target="SYSTEM_OUT">
+			<PatternLayout pattern="%p\t%t - %C{1}.%M(%L) | %m%n" />
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<Logger name="de.rwh" level="DEBUG" />
+
+		<Logger name="liquibase" level="WARN" />
+		<Logger name="LiquibaseSchemaResolver" level="WARN" />
+		<Logger name="ResourceAccessorXsdStreamResolver" level="WARN" />
+		<Logger name="ContextClassLoaderXsdStreamResolver" level="WARN" />
+
+		<Root level="DEBUG">
+			<AppenderRef ref="CONSOLE" />
+		</Root>
+	</Loggers>
+</Configuration>
