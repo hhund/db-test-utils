@@ -37,7 +37,7 @@ public class Database extends ExternalResource
 	{
 		try (Connection connection = embeddedPostgres.getPostgresDatabase().getConnection();
 				PreparedStatement statement = connection.prepareStatement(
-						"CREATE DATABASE " + dbName + dbTemplate != null ? (" TEMPLATE " + dbTemplate) : ""))
+						"CREATE DATABASE " + dbName + (dbTemplate != null ? (" TEMPLATE " + dbTemplate) : "")))
 		{
 			statement.execute();
 		}
