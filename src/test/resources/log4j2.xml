@@ -11,6 +11,7 @@
 	<Loggers>
 		<Logger name="de.rwh" level="DEBUG" />
 
+		<Logger name="com.opentable.db.postgres.embedded.EmbeddedPostgres" level="WARN" />
 		<Logger name="liquibase" level="WARN" />
 		<Logger name="LiquibaseSchemaResolver" level="WARN" />
 		<Logger name="ResourceAccessorXsdStreamResolver" level="WARN" />

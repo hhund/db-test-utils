@@ -27,10 +27,10 @@ public class RuleTest
 	@ClassRule
 	public static final LiquibaseTemplate template = new LiquibaseTemplate("db.changelog.xml",
 			Map.of("liquibase_user", LiquibaseTemplate.LIQUIBASE_USER, "server_users_group", DATABASE_USER_GROUP,
-					"server_user", DATABASE_USER, "server_user_password", DATABASE_PASSWORD));
+					"server_user", DATABASE_USER, "server_user_password", DATABASE_PASSWORD),
+			DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 	@Rule
-	public final Database database = new Database(template.getEmbeddedPostgres(),
-			LiquibaseTemplate.DATABASE_TEMPLATE, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
+	public final Database database = new Database(template);
 
 	@Test
 	public void testTableCreated() throws Exception

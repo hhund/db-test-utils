@@ -1,54 +1,25 @@
 package de.rwh.utils.test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.rules.ExternalResource;
-import org.postgresql.Driver;
-
-import com.opentable.db.postgres.embedded.EmbeddedPostgres;
 
 public class Database extends ExternalResource
 {
-	private final EmbeddedPostgres embeddedPostgres;
-
-	private final String dbTemplate;
-	private final String dbName;
-	private final String dbUser;
-	private final String dbPassword;
+	private final LiquibaseTemplate template;
 
 	private BasicDataSource dataSource;
 
-	public Database(EmbeddedPostgres embeddedPostgres, String dbTemplate, String dbName, String dbUser,
-			String dbPassword)
+	public Database(LiquibaseTemplate template)
 	{
-		this.embeddedPostgres = embeddedPostgres;
-
-		this.dbTemplate = dbTemplate;
-		this.dbName = dbName;
-		this.dbUser = dbUser;
-		this.dbPassword = dbPassword;
+		this.template = template;
 	}
 
 	@Override
 	protected void before() throws Throwable
 	{
-		try (Connection connection = embeddedPostgres.getPostgresDatabase().getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"CREATE DATABASE " + dbName + (dbTemplate != null ? (" TEMPLATE " + dbTemplate) : "")))
-		{
-			statement.execute();
-		}
-
-		dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(Driver.class.getName());
-		dataSource
-				.setUrl("jdbc:postgresql://localhost:" + embeddedPostgres.getPort() + "/" + dbName + "?user=" + dbUser);
-		dataSource.setUsername(dbUser);
-		dataSource.setPassword(dbPassword);
-		dataSource.setDefaultReadOnly(true);
+		template.createSchema();
 	}
 
 	@Override
@@ -56,7 +27,8 @@ public class Database extends ExternalResource
 	{
 		try
 		{
-			dataSource.close();
+			if (dataSource != null)
+				dataSource.close();
 		}
 		catch (SQLException e)
 		{
@@ -64,12 +36,11 @@ public class Database extends ExternalResource
 		}
 		finally
 		{
-			try (Connection connection = embeddedPostgres.getPostgresDatabase().getConnection();
-					PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + dbName))
+			try
 			{
-				statement.execute();
+				template.dropSchema();
 			}
-			catch (SQLException e)
+			catch (Exception e)
 			{
 				throw new RuntimeException(e);
 			}
@@ -78,6 +49,9 @@ public class Database extends ExternalResource
 
 	public BasicDataSource getDataSource()
 	{
+		if (dataSource == null)
+			dataSource = template.createDataSource();
+
 		return dataSource;
 	}
 }
