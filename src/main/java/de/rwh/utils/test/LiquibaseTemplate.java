@@ -38,7 +38,7 @@ public class LiquibaseTemplate extends ExternalResource
 	{
 		liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(),
 				DatabaseFactory.getInstance().getDatabase("postgresql"));
-
+		
 		changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
 
 		this.dbName = dbName;
@@ -71,6 +71,8 @@ public class LiquibaseTemplate extends ExternalResource
 		{
 			throw new RuntimeException(e);
 		}
+		
+		DatabaseFactory.reset();
 	}
 
 	public void createSchema() throws Exception
