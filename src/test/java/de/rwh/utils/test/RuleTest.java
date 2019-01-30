@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import de.rwh.utils.test.Database;
-import de.rwh.utils.test.LiquibaseTemplate;
+import de.rwh.utils.test.EmbeddedPostgresWithLiquibase;
 
 public class RuleTest
 {
@@ -25,8 +25,8 @@ public class RuleTest
 	private static final String DATABASE_PASSWORD = "test_user_password";
 
 	@ClassRule
-	public static final LiquibaseTemplate template = new LiquibaseTemplate("db.changelog.xml",
-			Map.of("liquibase_user", LiquibaseTemplate.LIQUIBASE_USER, "server_users_group", DATABASE_USER_GROUP,
+	public static final EmbeddedPostgresWithLiquibase template = new EmbeddedPostgresWithLiquibase("db.changelog.xml",
+			Map.of("liquibase_user", EmbeddedPostgresWithLiquibase.LIQUIBASE_USER, "server_users_group", DATABASE_USER_GROUP,
 					"server_user", DATABASE_USER, "server_user_password", DATABASE_PASSWORD),
 			DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD);
 	@Rule

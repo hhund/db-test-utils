@@ -7,11 +7,11 @@ import org.junit.rules.ExternalResource;
 
 public class Database extends ExternalResource
 {
-	private final LiquibaseTemplate template;
+	private final EmbeddedPostgresWithLiquibase template;
 
 	private BasicDataSource dataSource;
 
-	public Database(LiquibaseTemplate template)
+	public Database(EmbeddedPostgresWithLiquibase template)
 	{
 		this.template = template;
 	}
