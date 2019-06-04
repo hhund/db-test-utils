@@ -11,6 +11,10 @@
 		<version>0.7.0</version>
 	</parent>
 
+	<name>db-test-utils</name>
+	<description>Utility library for writing database integration tests with an embedded PostgreSQL and Liquibase for JUnit version ${junit.version}.</description>
+	<url>https://github.com/hhund/db-test-utils</url>
+
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -52,7 +56,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/hhund/db-test-utils.git</connection>
-		<developerConnection>scm:git:git@github.com/hhund/db-test-utils.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:hhund/db-test-utils.git</developerConnection>
 		<url>http://github.com/hhund/db-test-utils</url>
 	</scm>
 
