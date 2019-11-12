@@ -102,7 +102,7 @@ public class EmbeddedPostgresWithLiquibase extends ExternalResource
 		}
 		catch (IOException e)
 		{
-			throw new RuntimeException(e);
+			logger.error("Error while stopping embedded postgres - {}", e.getMessage());
 		}
 
 		DatabaseFactory.reset();
