@@ -1,9 +1,11 @@
 package de.rwh.utils.test;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.rules.ExternalResource;
@@ -72,7 +74,11 @@ public class EmbeddedPostgresWithLiquibase extends ExternalResource
 		}
 
 		logger.info("Starting embedded postgres ...");
-		embeddedPostgres = EmbeddedPostgres.start();
+		embeddedPostgres = EmbeddedPostgres.builder()
+				.setDataDirectory(Paths
+						.get(System.getProperty("java.io.tmpdir"), "embedded-pg", "tmp-data-dir-" + UUID.randomUUID())
+						.toAbsolutePath())
+				.start();
 
 		try (Connection connection = embeddedPostgres.getPostgresDatabase().getConnection();
 				PreparedStatement statement = connection.prepareStatement("CREATE DATABASE " + dbName))
