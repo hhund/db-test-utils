@@ -3,16 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.6.0</version>
+	<version>0.7.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
 		<artifactId>rwh-pom</artifactId>
-		<version>0.9.0</version>
+		<version>0.10.0</version>
 	</parent>
 
 	<name>db-test-utils</name>
-	<description>Utility library for writing database integration tests with an embedded PostgreSQL and Liquibase for JUnit version ${junit.version}.</description>
+	<description>Utility library for writing database integration tests with an embedded PostgreSQL and Liquibase for JUnit 4</description>
 	<url>https://github.com/hhund/db-test-utils</url>
 
 	<licenses>
@@ -24,8 +24,8 @@
 	</licenses>
 
 	<organization>
-		<name>Heilbronn University - Medical Informatics</name>
-		<url>http://www.mi.hs-heilbronn.de</url>
+		<name>Heilbronn University of Applied Sciences, Faculty of Informatics</name>
+		<url>https://www.hs-heilbronn.de/it</url>
 	</organization>
 
 	<developers>
@@ -36,8 +36,8 @@
 				<role>developer</role>
 			</roles>
 			<email>hauke.hund@hs-heilbronn.de</email>
-			<organization>University of Heilbronn - Medical Informatics</organization>
-			<organizationUrl>http://www.mi.hs-heilbronn.de</organizationUrl>
+			<organization>Heilbronn University of Applied Sciences, Faculty of Informatics</organization>
+			<organizationUrl>https://www.hs-heilbronn.de/hauke.hund</organizationUrl>
 		</developer>
 	</developers>
 
@@ -75,12 +75,12 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>3.8.7</version>
+			<version>3.8.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.10</version>
+			<version>42.2.12</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opentable.components</groupId>
@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>de.hs-heilbronn.mi</groupId>
 			<artifactId>log4j2-utils</artifactId>
-			<version>0.5.0</version>
+			<version>0.6.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
