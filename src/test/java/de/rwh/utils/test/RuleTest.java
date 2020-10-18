@@ -12,9 +12,16 @@ import java.util.Map;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class RuleTest
 {
+	static
+	{
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
+	}
+
 	private static final String DATABASE_NAME = "test_database";
 
 	private static final String DATABASE_USER_GROUP = "test_group";
