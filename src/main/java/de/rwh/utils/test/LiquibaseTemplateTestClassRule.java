@@ -86,6 +86,9 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 	@Override
 	protected void before() throws Throwable
 	{
+		adminDataSource.start();
+		liquibaseDataSource.start();
+
 		try (Connection connection = adminDataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement(
 						"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"
