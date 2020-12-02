@@ -25,8 +25,8 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 	private static final Logger logger = LoggerFactory.getLogger(LiquibaseTemplateTestClassRule.class);
 
 	public static final String DEFAULT_TEST_DB_NAME = "db";
-	public static final String DEFAULT_TEST_ADMIN_DB_JDBC_URL = "jdbc:postgresql://localhost:5432/postgres";
-	public static final String DEFAULT_TEST_DB_JDBC_URL = "jdbc:postgresql://localhost:5432/" + DEFAULT_TEST_DB_NAME;
+	public static final String DEFAULT_TEST_ADMIN_DB_JDBC_URL = "jdbc:postgresql://localhost:54321/postgres";
+	public static final String DEFAULT_TEST_DB_JDBC_URL = "jdbc:postgresql://localhost:54321/" + DEFAULT_TEST_DB_NAME;
 	public static final String DEFAULT_TEST_DB_USERNAME = "postgres";
 	public static final String DEFAULT_TEST_DB_PASSWORD = "password";
 

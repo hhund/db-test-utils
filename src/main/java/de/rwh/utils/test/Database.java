@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.rules.ExternalResource;
 
+@Deprecated
 public class Database extends ExternalResource
 {
 	private final EmbeddedPostgresWithLiquibase template;

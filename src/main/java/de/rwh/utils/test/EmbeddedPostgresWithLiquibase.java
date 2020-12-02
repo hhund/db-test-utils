@@ -21,6 +21,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
+@Deprecated
 public class EmbeddedPostgresWithLiquibase extends ExternalResource
 {
 	private static final Logger logger = LoggerFactory.getLogger(EmbeddedPostgresWithLiquibase.class);

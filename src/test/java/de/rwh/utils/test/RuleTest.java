@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+@Deprecated
 public class RuleTest
 {
 	static
