@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.10.0</version>
+	<version>0.11.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
 		<artifactId>rwh-pom</artifactId>
-		<version>0.13.0</version>
+		<version>0.14.0</version>
 	</parent>
 
 	<name>db-test-utils</name>
@@ -75,12 +75,12 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.2.0</version>
+			<version>4.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.18</version>
+			<version>42.2.20</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opentable.components</groupId>
@@ -108,7 +108,7 @@
 		<dependency>
 			<groupId>de.hs-heilbronn.mi</groupId>
 			<artifactId>log4j2-utils</artifactId>
-			<version>0.8.0</version>
+			<version>0.9.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -180,7 +180,7 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.34.1</version>
+				<version>0.36.0</version>
 				<extensions>true</extensions>
 
 				<executions>
