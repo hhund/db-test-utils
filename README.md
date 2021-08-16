@@ -8,6 +8,6 @@ Utility library for writing JUnit database integration tests with an embedded Po
 <dependency>
     <groupId>de.hs-heilbronn.mi</groupId>
     <artifactId>db-test-utils</artifactId>
-    <version>0.11.0</version>
+    <version>0.12.0</version>
 </dependency>
 ```
