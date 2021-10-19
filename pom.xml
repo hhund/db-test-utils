@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.12.0</version>
+	<version>0.13.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
 		<artifactId>rwh-pom</artifactId>
-		<version>0.15.0</version>
+		<version>0.16.0</version>
 	</parent>
 
 	<name>db-test-utils</name>
@@ -75,12 +75,12 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.4.3</version>
+			<version>4.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.23</version>
+			<version>42.2.24</version>
 		</dependency>
 		<dependency>
 			<groupId>com.opentable.components</groupId>
