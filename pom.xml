@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.14.0</version>
+	<version>0.15.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
 		<artifactId>rwh-pom</artifactId>
-		<version>0.17.0</version>
+		<version>0.18.0</version>
 	</parent>
 
 	<name>db-test-utils</name>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.24</version>
+			<version>42.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -102,7 +102,7 @@
 		<dependency>
 			<groupId>de.hs-heilbronn.mi</groupId>
 			<artifactId>log4j2-utils</artifactId>
-			<version>0.11.0</version>
+			<version>0.12.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -187,7 +187,7 @@
 						<configuration>
 							<images>
 								<image>
-									<name>postgres:13</name>
+									<name>postgres:14</name>
 									<run>
 										<ports>
 											<port>127.0.0.1:54321:5432</port>
