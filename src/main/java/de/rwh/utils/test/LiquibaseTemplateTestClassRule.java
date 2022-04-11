@@ -15,10 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import liquibase.Contexts;
 import liquibase.Liquibase;
+import liquibase.Scope;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import liquibase.ui.LoggerUIService;
 
 public class LiquibaseTemplateTestClassRule extends ExternalResource
 {
@@ -136,27 +138,30 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 			}
 		}
 
-		try (Connection connection = liquibaseDataSource.getConnection())
+		Scope.child(Scope.Attr.ui, new LoggerUIService(), () ->
 		{
-			connection.setReadOnly(false);
-
-			Database database = DatabaseFactory.getInstance()
-					.findCorrectDatabaseImplementation(new JdbcConnection(connection));
-
-			try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database))
+			try (Connection connection = liquibaseDataSource.getConnection())
 			{
-				changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
-				liquibase.getDatabase().setConnection(new JdbcConnection(connection));
+				connection.setReadOnly(false);
 
-				logger.debug("Executing liquibase change-log");
-				liquibase.update(new Contexts());
+				Database database = DatabaseFactory.getInstance()
+						.findCorrectDatabaseImplementation(new JdbcConnection(connection));
+
+				try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database))
+				{
+					changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
+					liquibase.getDatabase().setConnection(new JdbcConnection(connection));
+
+					logger.debug("Executing liquibase change-log");
+					liquibase.update(new Contexts());
+				}
 			}
-		}
-		catch (Exception e)
-		{
-			logger.warn("Error while runnig liquibase change-log: {}", e.getMessage());
-			throw e;
-		}
+			catch (Exception e)
+			{
+				logger.warn("Error while runnig liquibase change-log: {}", e.getMessage());
+				throw e;
+			}
+		});
 
 		if (createTemplate)
 			createTemplateDatabase();
