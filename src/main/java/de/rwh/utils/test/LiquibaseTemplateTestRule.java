@@ -27,20 +27,48 @@ public class LiquibaseTemplateTestRule extends ExternalResource
 	@Override
 	protected void after()
 	{
-		try (Connection connection = adminDataSource.getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"
-								+ "; DROP DATABASE " + databaseName + "; CREATE DATABASE " + databaseName + " TEMPLATE "
-								+ templateDatabaseName))
+		try (Connection connection = adminDataSource.getConnection())
 		{
-			statement.setString(1, databaseName);
+			try (PreparedStatement statement = connection.prepareStatement(
+					"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"))
+			{
+				statement.setString(1, databaseName);
 
-			logger.debug("Executing: {}", statement.toString());
-			statement.execute();
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while terminating backend {}: {}", databaseName, e.getMessage());
+				throw new RuntimeException(e);
+			}
+
+			try (PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + databaseName))
+			{
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while dropping {}: {}", databaseName, e.getMessage());
+				throw new RuntimeException(e);
+			}
+
+			try (PreparedStatement statement = connection
+					.prepareStatement("CREATE DATABASE " + databaseName + " TEMPLATE " + templateDatabaseName))
+			{
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while creating {} template: {}", databaseName, e.getMessage());
+				throw new RuntimeException(e);
+			}
 		}
 		catch (SQLException e)
 		{
-			logger.warn("Error while dropping/creating {}: {}", databaseName, e.getMessage());
+			logger.warn("Error while connecting to {}: {}", databaseName, e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}

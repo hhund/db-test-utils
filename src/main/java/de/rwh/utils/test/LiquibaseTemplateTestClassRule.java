@@ -91,94 +91,117 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 		adminDataSource.start();
 		liquibaseDataSource.start();
 
-		try (Connection connection = adminDataSource.getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"
-								+ "; DROP DATABASE " + databaseName + "; CREATE DATABASE " + databaseName))
+		try (Connection connection = adminDataSource.getConnection())
 		{
-			statement.setString(1, databaseName);
+			try (PreparedStatement statement = connection.prepareStatement(
+					"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"))
+			{
+				statement.setString(1, databaseName);
 
-			logger.debug("Executing: {}", statement.toString());
-			statement.execute();
-		}
-		catch (SQLException e)
-		{
-			logger.warn("Error while dropping/creating {}: {}", databaseName, e.getMessage());
-			throw new RuntimeException(e);
-		}
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while terminating backend {}: {}", databaseName, e.getMessage());
+				throw new RuntimeException(e);
+			}
 
-		try (Connection connection = adminDataSource.getConnection();
-				PreparedStatement statement = connection.prepareStatement(
-						"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"
-								+ "; DROP DATABASE " + databaseName + "; CREATE DATABASE " + databaseName))
-		{
-			statement.setString(1, databaseName);
-
-			logger.debug("Executing: {}", statement.toString());
-			statement.execute();
-		}
-		catch (SQLException e)
-		{
-			logger.warn("Error while dropping/creating {}: {}", databaseName, e.getMessage());
-			throw new RuntimeException(e);
-		}
-
-		if (templateDbExists())
-		{
-			try (Connection connection = adminDataSource.getConnection();
-					PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + templateDatabaseName))
+			try (PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + databaseName))
 			{
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
 			}
 			catch (SQLException e)
 			{
-				logger.warn("Error while dropping/creating {}: {}", databaseName, e.getMessage());
+				logger.warn("Error while dropping {}: {}", databaseName, e.getMessage());
 				throw new RuntimeException(e);
 			}
-		}
 
-		Scope.child(Scope.Attr.ui, new LoggerUIService(), () ->
-		{
-			try (Connection connection = liquibaseDataSource.getConnection())
+			try (PreparedStatement statement = connection.prepareStatement("CREATE DATABASE " + databaseName))
 			{
-				connection.setReadOnly(false);
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while creating {}: {}", databaseName, e.getMessage());
+				throw new RuntimeException(e);
+			}
 
-				Database database = DatabaseFactory.getInstance()
-						.findCorrectDatabaseImplementation(new JdbcConnection(connection));
-
-				try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(), database))
+			if (templateDbExists(connection))
+			{
+				try (PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + templateDatabaseName))
 				{
-					changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
-					liquibase.getDatabase().setConnection(new JdbcConnection(connection));
-
-					logger.debug("Executing liquibase change-log");
-					liquibase.update(new Contexts());
+					logger.debug("Executing: {}", statement.toString());
+					statement.execute();
+				}
+				catch (SQLException e)
+				{
+					logger.warn("Error while dropping template {}: {}", databaseName, e.getMessage());
+					throw new RuntimeException(e);
 				}
 			}
-			catch (Exception e)
-			{
-				logger.warn("Error while runnig liquibase change-log: {}", e.getMessage());
-				throw e;
-			}
-		});
 
-		if (createTemplate)
-			createTemplateDatabase();
+			Scope.child(Scope.Attr.ui, new LoggerUIService(), () ->
+			{
+				try (Connection liquibaseConnection = liquibaseDataSource.getConnection())
+				{
+					liquibaseConnection.setReadOnly(false);
+
+					Database database = DatabaseFactory.getInstance()
+							.findCorrectDatabaseImplementation(new JdbcConnection(liquibaseConnection));
+
+					try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(),
+							database))
+					{
+						changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
+						liquibase.getDatabase().setConnection(new JdbcConnection(liquibaseConnection));
+
+						logger.debug("Executing liquibase change-log");
+						liquibase.update(new Contexts());
+					}
+				}
+				catch (Exception e)
+				{
+					logger.warn("Error while runnig liquibase change-log: {}", e.getMessage());
+					throw e;
+				}
+			});
+
+			if (createTemplate)
+				createTemplateDatabase(connection);
+		}
+		catch (SQLException e)
+		{
+			logger.warn("Error while connecting to {}: {}", databaseName, e.getMessage());
+			throw new RuntimeException(e);
+		}
 	}
 
-	public final void createTemplateDatabase() throws SQLException
+	public final void createTemplateDatabase(Connection connection) throws SQLException
 	{
-		if (!templateDbExists())
+		if (!templateDbExists(connection))
 		{
 			logger.info("Creating template {}", templateDatabaseName);
-			try (Connection connection = adminDataSource.getConnection();
-					PreparedStatement statement = connection.prepareStatement(
-							"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"
-									+ "; CREATE DATABASE " + templateDatabaseName + " TEMPLATE " + databaseName))
+
+			try (PreparedStatement statement = connection.prepareStatement(
+					"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"))
 			{
 				statement.setString(1, databaseName);
 
+				logger.debug("Executing: {}", statement.toString());
+				statement.execute();
+			}
+			catch (SQLException e)
+			{
+				logger.warn("Error while terminating backend: {}", e.getMessage());
+				throw e;
+			}
+
+			try (PreparedStatement statement = connection
+					.prepareStatement("CREATE DATABASE " + templateDatabaseName + " TEMPLATE " + databaseName))
+			{
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
 			}
@@ -194,13 +217,13 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 		}
 	}
 
-	private boolean templateDbExists() throws SQLException
+	private boolean templateDbExists(Connection connection) throws SQLException
 	{
-		try (Connection connection = adminDataSource.getConnection();
-				PreparedStatement statement = connection
-						.prepareStatement("SELECT count(*) FROM pg_database WHERE datname = ?"))
+		try (PreparedStatement statement = connection
+				.prepareStatement("SELECT count(*) FROM pg_database WHERE datname = ?"))
 		{
 			statement.setString(1, templateDatabaseName);
+
 			try (ResultSet result = statement.executeQuery())
 			{
 				return result.next() && result.getInt(1) > 0;
