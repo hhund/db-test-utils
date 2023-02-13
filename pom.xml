@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.18.0</version>
+	<version>0.19.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
@@ -12,7 +12,7 @@
 	</parent>
 
 	<name>db-test-utils</name>
-	<description>Utility library for writing database integration tests with an embedded PostgreSQL and Liquibase for JUnit 4</description>
+	<description>Utility library for writing database integration tests with PostgreSQL and Liquibase for JUnit 4</description>
 	<url>https://github.com/hhund/db-test-utils</url>
 
 	<licenses>
@@ -75,12 +75,12 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.16.1</version>
+			<version>4.19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.5.0</version>
+			<version>42.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -174,7 +174,7 @@
 			<plugin>
 				<groupId>io.fabric8</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.40.2</version>
+				<version>0.41.0</version>
 				<extensions>true</extensions>
 
 				<executions>
@@ -187,7 +187,7 @@
 						<configuration>
 							<images>
 								<image>
-									<name>postgres:14</name>
+									<name>postgres:15</name>
 									<run>
 										<ports>
 											<port>127.0.0.1:54321:5432</port>
