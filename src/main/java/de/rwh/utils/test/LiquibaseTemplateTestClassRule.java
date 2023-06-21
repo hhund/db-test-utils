@@ -1,9 +1,11 @@
 package de.rwh.utils.test;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,12 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import liquibase.Contexts;
-import liquibase.Liquibase;
+import liquibase.LabelExpression;
 import liquibase.Scope;
+import liquibase.changelog.ChangeLogParameters;
+import liquibase.command.CommandScope;
+import liquibase.command.core.UpdateCommandStep;
+import liquibase.command.core.helpers.DatabaseChangelogCommandStep;
+import liquibase.command.core.helpers.DbUrlConnectionCommandStep;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.ui.LoggerUIService;
 
 public class LiquibaseTemplateTestClassRule extends ExternalResource
@@ -152,15 +158,26 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 					Database database = DatabaseFactory.getInstance()
 							.findCorrectDatabaseImplementation(new JdbcConnection(liquibaseConnection));
 
-					try (Liquibase liquibase = new Liquibase(changeLogFile, new ClassLoaderResourceAccessor(),
-							database))
-					{
-						changeLogParameters.forEach(liquibase.getChangeLogParameters()::set);
-						liquibase.getDatabase().setConnection(new JdbcConnection(liquibaseConnection));
+					ChangeLogParameters changeLogParameters = new ChangeLogParameters(database);
+					this.changeLogParameters.forEach(changeLogParameters::set);
+					ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-						logger.debug("Executing liquibase change-log");
-						liquibase.update(new Contexts());
-					}
+					CommandScope updateCommand = new CommandScope(UpdateCommandStep.COMMAND_NAME);
+					updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+					updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changeLogFile);
+					updateCommand.addArgumentValue(UpdateCommandStep.CONTEXTS_ARG, new Contexts().toString());
+					updateCommand.addArgumentValue(UpdateCommandStep.LABEL_FILTER_ARG,
+							new LabelExpression().getOriginalString());
+					updateCommand.addArgumentValue(DatabaseChangelogCommandStep.CHANGELOG_PARAMETERS,
+							changeLogParameters);
+					updateCommand.setOutput(output);
+
+					logger.info("Executing DB migration ...");
+					updateCommand.execute();
+
+					Arrays.stream(output.toString().split("[\r\n]+")).filter(row -> !row.isBlank())
+							.forEach(row -> logger.debug("{}", row));
+					logger.info("Executing DB migration [Done]");
 				}
 				catch (Exception e)
 				{
