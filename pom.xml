@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>db-test-utils</artifactId>
-	<version>0.20.0</version>
+	<version>0.21.0</version>
 
 	<parent>
 		<groupId>de.hs-heilbronn.mi</groupId>
 		<artifactId>rwh-pom</artifactId>
-		<version>0.22.0</version>
+		<version>0.23.0</version>
 	</parent>
 
 	<name>db-test-utils</name>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>4.21.1</version>
+			<version>4.22.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
