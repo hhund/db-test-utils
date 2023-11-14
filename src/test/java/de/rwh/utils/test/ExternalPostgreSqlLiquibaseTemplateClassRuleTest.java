@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 @Category(DockerTest.class)
-public class TemplateRuleTest
+public class ExternalPostgreSqlLiquibaseTemplateClassRuleTest
 {
 	static
 	{
@@ -26,7 +26,8 @@ public class TemplateRuleTest
 		SLF4JBridgeHandler.install();
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(TemplateRuleTest.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(ExternalPostgreSqlLiquibaseTemplateClassRuleTest.class);
 
 	private static final String DATABASE_USER_GROUP = "test_group";
 	private static final String DATABASE_USER = "test_user";
@@ -39,19 +40,18 @@ public class TemplateRuleTest
 
 	private static final String INTEGRATION_TEST_DB_TEMPLATE_NAME = "test_template";
 
-	protected static final BasicDataSource adminDataSource = LiquibaseTemplateTestClassRule
-			.createAdminBasicDataSource();
-	protected static final BasicDataSource liquibaseDataSource = LiquibaseTemplateTestClassRule
-			.createLiquibaseDataSource();
+	protected static final BasicDataSource rootDataSource = ExternalPostgreSqlLiquibaseTemplateClassRule
+			.createRootBasicDataSource();
+	protected static final BasicDataSource testDataSource = ExternalPostgreSqlLiquibaseTemplateClassRule
+			.createTestDataSource();
 
 	@ClassRule
-	public static final LiquibaseTemplateTestClassRule liquibaseRule = new LiquibaseTemplateTestClassRule(
-			adminDataSource, LiquibaseTemplateTestClassRule.DEFAULT_TEST_DB_NAME, INTEGRATION_TEST_DB_TEMPLATE_NAME,
-			liquibaseDataSource, CHANGE_LOG_FILE, CHANGE_LOG_PARAMETERS, true);
+	public static final ExternalPostgreSqlLiquibaseTemplateClassRule externalRule = new ExternalPostgreSqlLiquibaseTemplateClassRule(
+			rootDataSource, ExternalPostgreSqlLiquibaseTemplateClassRule.DEFAULT_TEST_DB_NAME,
+			INTEGRATION_TEST_DB_TEMPLATE_NAME, testDataSource, CHANGE_LOG_FILE, CHANGE_LOG_PARAMETERS, true);
 
 	@Rule
-	public final LiquibaseTemplateTestRule templateRule = new LiquibaseTemplateTestRule(adminDataSource,
-			LiquibaseTemplateTestClassRule.DEFAULT_TEST_DB_NAME, INTEGRATION_TEST_DB_TEMPLATE_NAME);
+	public final PostgresTemplateRule templateRule = new PostgresTemplateRule(externalRule);
 
 	@Test
 	public void test1() throws Exception
@@ -65,7 +65,7 @@ public class TemplateRuleTest
 
 	private int countTestTable() throws SQLException
 	{
-		try (Connection connection = liquibaseDataSource.getConnection();
+		try (Connection connection = testDataSource.getConnection();
 				PreparedStatement statement = connection.prepareStatement("SELECT count(*) FROM test_table");
 				ResultSet result = statement.executeQuery())
 		{
@@ -76,7 +76,7 @@ public class TemplateRuleTest
 
 	private void insertIntoTestTable() throws SQLException
 	{
-		try (Connection connection = liquibaseDataSource.getConnection())
+		try (Connection connection = testDataSource.getConnection())
 		{
 			connection.setReadOnly(false);
 

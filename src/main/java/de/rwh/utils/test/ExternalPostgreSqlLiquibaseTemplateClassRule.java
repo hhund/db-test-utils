@@ -28,9 +28,9 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.ui.LoggerUIService;
 
-public class LiquibaseTemplateTestClassRule extends ExternalResource
+public class ExternalPostgreSqlLiquibaseTemplateClassRule extends ExternalResource implements TemplateClassRule
 {
-	private static final Logger logger = LoggerFactory.getLogger(LiquibaseTemplateTestClassRule.class);
+	private static final Logger logger = LoggerFactory.getLogger(ExternalPostgreSqlLiquibaseTemplateClassRule.class);
 
 	public static final String DEFAULT_TEST_DB_NAME = "db";
 	public static final String DEFAULT_TEST_ADMIN_DB_JDBC_URL = "jdbc:postgresql://localhost:54321/postgres";
@@ -38,7 +38,7 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 	public static final String DEFAULT_TEST_DB_USERNAME = "postgres";
 	public static final String DEFAULT_TEST_DB_PASSWORD = "password";
 
-	public static BasicDataSource createLiquibaseDataSource()
+	public static BasicDataSource createTestDataSource()
 	{
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(Driver.class.getName());
@@ -53,7 +53,7 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 		return dataSource;
 	}
 
-	public static BasicDataSource createAdminBasicDataSource()
+	public static BasicDataSource createRootBasicDataSource()
 	{
 		BasicDataSource dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(Driver.class.getName());
@@ -67,24 +67,24 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 		return dataSource;
 	}
 
-	private final BasicDataSource adminDataSource;
-	private final String databaseName;
+	private final BasicDataSource rootDataSource;
+	private final String testDatabaseName;
 	private final String templateDatabaseName;
 
-	private final BasicDataSource liquibaseDataSource;
+	private final BasicDataSource testDataSource;
 	private final String changeLogFile;
 	private final Map<String, String> changeLogParameters = new HashMap<>();
 	private final boolean createTemplate;
 
-	public LiquibaseTemplateTestClassRule(BasicDataSource adminDataSource, String databaseName,
-			String templateDatabaseName, BasicDataSource liquibaseDataSource, String changeLogFile,
+	public ExternalPostgreSqlLiquibaseTemplateClassRule(BasicDataSource rootDataSource, String databaseName,
+			String templateDatabaseName, BasicDataSource testDataSource, String changeLogFile,
 			Map<String, String> changeLogParameters, boolean createTemplate)
 	{
-		this.adminDataSource = adminDataSource;
-		this.databaseName = databaseName;
+		this.rootDataSource = rootDataSource;
+		this.testDatabaseName = databaseName;
 		this.templateDatabaseName = templateDatabaseName;
 
-		this.liquibaseDataSource = liquibaseDataSource;
+		this.testDataSource = testDataSource;
 		this.changeLogFile = changeLogFile;
 		if (changeLogParameters != null)
 			this.changeLogParameters.putAll(changeLogParameters);
@@ -94,44 +94,44 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 	@Override
 	protected void before() throws Throwable
 	{
-		adminDataSource.start();
-		liquibaseDataSource.start();
+		rootDataSource.start();
+		testDataSource.start();
 
-		try (Connection connection = adminDataSource.getConnection())
+		try (Connection connection = rootDataSource.getConnection())
 		{
 			try (PreparedStatement statement = connection.prepareStatement(
 					"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"))
 			{
-				statement.setString(1, databaseName);
+				statement.setString(1, testDatabaseName);
 
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
 			}
 			catch (SQLException e)
 			{
-				logger.warn("Error while terminating backend {}: {}", databaseName, e.getMessage());
+				logger.warn("Error while terminating backend {}: {}", testDatabaseName, e.getMessage());
 				throw new RuntimeException(e);
 			}
 
-			try (PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + databaseName))
+			try (PreparedStatement statement = connection.prepareStatement("DROP DATABASE " + testDatabaseName))
 			{
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
 			}
 			catch (SQLException e)
 			{
-				logger.warn("Error while dropping {}: {}", databaseName, e.getMessage());
+				logger.warn("Error while dropping {}: {}", testDatabaseName, e.getMessage());
 				throw new RuntimeException(e);
 			}
 
-			try (PreparedStatement statement = connection.prepareStatement("CREATE DATABASE " + databaseName))
+			try (PreparedStatement statement = connection.prepareStatement("CREATE DATABASE " + testDatabaseName))
 			{
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
 			}
 			catch (SQLException e)
 			{
-				logger.warn("Error while creating {}: {}", databaseName, e.getMessage());
+				logger.warn("Error while creating {}: {}", testDatabaseName, e.getMessage());
 				throw new RuntimeException(e);
 			}
 
@@ -144,14 +144,14 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 				}
 				catch (SQLException e)
 				{
-					logger.warn("Error while dropping template {}: {}", databaseName, e.getMessage());
+					logger.warn("Error while dropping template {}: {}", testDatabaseName, e.getMessage());
 					throw new RuntimeException(e);
 				}
 			}
 
 			Scope.child(Scope.Attr.ui, new LoggerUIService(), () ->
 			{
-				try (Connection liquibaseConnection = liquibaseDataSource.getConnection())
+				try (Connection liquibaseConnection = testDataSource.getConnection())
 				{
 					liquibaseConnection.setReadOnly(false);
 
@@ -191,7 +191,7 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 		}
 		catch (SQLException e)
 		{
-			logger.warn("Error while connecting to {}: {}", databaseName, e.getMessage());
+			logger.warn("Error while connecting to {}: {}", testDatabaseName, e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}
@@ -205,7 +205,7 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 			try (PreparedStatement statement = connection.prepareStatement(
 					"SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = ?"))
 			{
-				statement.setString(1, databaseName);
+				statement.setString(1, testDatabaseName);
 
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
@@ -217,7 +217,7 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 			}
 
 			try (PreparedStatement statement = connection
-					.prepareStatement("CREATE DATABASE " + templateDatabaseName + " TEMPLATE " + databaseName))
+					.prepareStatement("CREATE DATABASE " + templateDatabaseName + " TEMPLATE " + testDatabaseName))
 			{
 				logger.debug("Executing: {}", statement.toString());
 				statement.execute();
@@ -246,5 +246,23 @@ public class LiquibaseTemplateTestClassRule extends ExternalResource
 				return result.next() && result.getInt(1) > 0;
 			}
 		}
+	}
+
+	@Override
+	public BasicDataSource getRootDataSource()
+	{
+		return rootDataSource;
+	}
+
+	@Override
+	public String getDatabaseName()
+	{
+		return testDatabaseName;
+	}
+
+	@Override
+	public String getTemplateDatabaseName()
+	{
+		return templateDatabaseName;
 	}
 }

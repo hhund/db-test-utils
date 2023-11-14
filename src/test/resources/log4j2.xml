@@ -17,7 +17,7 @@
 		<Logger name="ResourceAccessorXsdStreamResolver" level="WARN" />
 		<Logger name="ContextClassLoaderXsdStreamResolver" level="WARN" />
 
-		<Root level="DEBUG">
+		<Root level="WARN">
 			<AppenderRef ref="CONSOLE" />
 		</Root>
 	</Loggers>
