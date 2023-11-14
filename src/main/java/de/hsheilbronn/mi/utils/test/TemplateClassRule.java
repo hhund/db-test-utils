@@ -1,4 +1,4 @@
-package de.rwh.utils.test;
+package de.hsheilbronn.mi.utils.test;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 

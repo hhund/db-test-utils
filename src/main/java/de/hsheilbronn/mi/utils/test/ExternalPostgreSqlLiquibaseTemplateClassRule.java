@@ -1,4 +1,4 @@
-package de.rwh.utils.test;
+package de.hsheilbronn.mi.utils.test;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.Connection;

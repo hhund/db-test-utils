@@ -1,4 +1,4 @@
-package de.rwh.utils.test;
+package de.hsheilbronn.mi.utils.test;
 
 import static org.junit.Assert.assertEquals;
 

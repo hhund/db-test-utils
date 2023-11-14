@@ -1,4 +1,4 @@
-package de.rwh.utils.test;
+package de.hsheilbronn.mi.utils.test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-@Category(DockerTest.class)
+@Category(IntegrationTest.class)
 public class ExternalPostgreSqlLiquibaseTemplateClassRuleTest
 {
 	static

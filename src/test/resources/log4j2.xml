@@ -1,21 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO" monitorInterval="30"
-	verbose="false">
-
+<Configuration status="INFO" strict="true" monitorInterval="30" verbose="false">
 	<Appenders>
-		<Console name="CONSOLE" target="SYSTEM_OUT">
-			<PatternLayout pattern="%p\t%t - %C{1}.%M(%L) | %m%n" />
-		</Console>
+		<Appender name="CONSOLE" type="Console">
+			<Layout type="PatternLayout" pattern="%p\t%t - %C{1}.%M(%L) | %m%n" />
+		</Appender>
 	</Appenders>
-
 	<Loggers>
-		<Logger name="de.rwh" level="DEBUG" />
+		<Logger name="de.hsheilbronn.mi.utils.test" level="DEBUG" />
 		<Logger name="org.apache.commons.dbcp2" level="INFO" />
-
-		<Logger name="liquibase" level="WARN" />
-		<Logger name="LiquibaseSchemaResolver" level="WARN" />
-		<Logger name="ResourceAccessorXsdStreamResolver" level="WARN" />
-		<Logger name="ContextClassLoaderXsdStreamResolver" level="WARN" />
 
 		<Root level="WARN">
 			<AppenderRef ref="CONSOLE" />

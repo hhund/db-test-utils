@@ -106,14 +106,16 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j2-impl</artifactId>
-			<version>2.21.1</version>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j2-impl</artifactId>
+			<version>2.21.1</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -169,7 +171,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.2</version>
 				<configuration>
-					<excludedGroups>de.rwh.utils.test.DockerTest</excludedGroups>
+					<excludedGroups>de.hsheilbronn.mi.utils.test.IntegrationTest</excludedGroups>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -180,7 +182,7 @@
 					<includes>
 						<include>**/*</include>
 					</includes>
-					<groups>de.rwh.utils.test.DockerTest</groups>
+					<groups>de.hsheilbronn.mi.utils.test.IntegrationTest</groups>
 				</configuration>
 				<executions>
 					<execution>
