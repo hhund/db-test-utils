@@ -22,7 +22,7 @@ import liquibase.changelog.ChangeLogParameters;
 import liquibase.command.CommandScope;
 import liquibase.command.core.UpdateCommandStep;
 import liquibase.command.core.helpers.DatabaseChangelogCommandStep;
-import liquibase.command.core.helpers.DbUrlConnectionCommandStep;
+import liquibase.command.core.helpers.DbUrlConnectionArgumentsCommandStep;
 import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -163,7 +163,7 @@ public class ExternalPostgreSqlLiquibaseTemplateClassRule extends ExternalResour
 					ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 					CommandScope updateCommand = new CommandScope(UpdateCommandStep.COMMAND_NAME);
-					updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+					updateCommand.addArgumentValue(DbUrlConnectionArgumentsCommandStep.DATABASE_ARG, database);
 					updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changeLogFile);
 					updateCommand.addArgumentValue(UpdateCommandStep.CONTEXTS_ARG, new Contexts().toString());
 					updateCommand.addArgumentValue(UpdateCommandStep.LABEL_FILTER_ARG,
